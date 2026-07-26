@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day 5 · 合并准备：数据监控器 · SAP GR学习营</title>
+<style>
+:root{--navy:#054D25;--dark:#0A6B35;--primary:#0F7B3A;--mid:#1A9948;--steel:#4A8F65;--muted:#5B8C6B;--light:#A8D5B5;--pale:#D0EDD8;--bg:#EBF7EF;--white:#FFFFFF;--text:#0D2A18;--text2:#1F3D2C;--r:8px;--shadow:0 2px 12px rgba(15,123,58,.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.topnav{background:var(--dark);padding:0 32px;display:flex;align-items:center;gap:24px;height:56px;position:sticky;top:0;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topnav .logo{color:#fff;font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}.topnav .logo span{color:var(--light)}
+.topnav nav{display:flex;gap:4px;margin-left:auto}
+.topnav nav a{color:var(--light);text-decoration:none;padding:6px 12px;border-radius:4px;font-size:13px;transition:.15s}
+.topnav nav a:hover,.topnav nav a.active{background:var(--primary);color:#fff}
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:252px;min-width:252px;background:var(--dark);padding:20px 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+.sidebar .wk{color:var(--light);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 18px 4px}
+.sidebar a{display:flex;align-items:center;gap:9px;color:var(--pale);text-decoration:none;padding:9px 18px;font-size:13px;border-left:3px solid transparent;transition:.15s}
+.sidebar a:hover{background:rgba(255,255,255,.07);border-left-color:var(--light)}
+.sidebar a.active{background:rgba(15,123,58,.28);border-left-color:var(--primary);color:#fff}
+.sidebar .dn{background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.sidebar .sep{height:1px;background:rgba(255,255,255,.08);margin:8px 14px}
+.main{flex:1;padding:32px 40px;max-width:920px}
+.hero{background:linear-gradient(135deg,#003087 0%,var(--dark) 55%,var(--primary) 100%);border-radius:var(--r);padding:36px 40px 28px;color:#fff;margin-bottom:28px;border-bottom:3px solid var(--primary)}
+.hero h1{font-size:24px;margin-bottom:8px;line-height:1.35}
+.hero .sub{color:var(--pale);font-size:13.5px;max-width:640px}
+.hero .meta{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.hero .badge{background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;font-size:12px;color:var(--pale)}
+.bc{font-size:12px;color:var(--muted);margin-bottom:18px}
+.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--primary)}
+h2.sec{font-size:19px;color:var(--dark);border-left:4px solid var(--primary);padding-left:12px;margin:28px 0 14px}
+h3.sub{font-size:14.5px;color:var(--primary);margin:18px 0 8px;font-weight:700}
+p.b{font-size:14px;color:var(--text2);margin-bottom:11px;line-height:1.78}
+ul.b{font-size:14px;color:var(--text2);padding-left:20px;margin-bottom:12px;line-height:1.8}
+.box{border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13.5px;line-height:1.72}
+.box.blue{background:var(--pale);border-left:4px solid var(--primary);color:var(--text)}
+.box.green{background:#d1fae5;border-left:4px solid #059669;color:#064e3b}
+.box.amber{background:#fef3c7;border-left:4px solid #d97706;color:#78350f}
+.box.red{background:#fee2e2;border-left:4px solid #dc2626;color:#7f1d1d}
+.flow{display:flex;align-items:flex-start;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 0 12px;margin:18px 0}
+.flow-node{display:flex;flex-direction:column;align-items:center;min-width:88px}
+.flow-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;flex-shrink:0}
+.flow-label{font-size:10px;font-weight:700;color:var(--dark);margin-top:7px;text-align:center}
+.flow-sub{font-size:9px;color:var(--muted);text-align:center;margin-top:2px;line-height:1.4}
+.flow-arrow{display:flex;flex-direction:column;align-items:center;padding-top:14px;min-width:32px}
+.flow-arrow-sym{font-size:16px;color:var(--primary);font-weight:700}
+.flow-arrow-lbl{font-size:8px;color:var(--muted);text-align:center;margin-top:1px;line-height:1.3}
+table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 18px;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+table.st th{background:var(--dark);color:#fff;padding:10px 14px;text-align:left}
+table.st td{padding:9px 14px;border-bottom:1px solid var(--pale);color:var(--text2)}
+table.st tr:last-child td{border-bottom:none}
+table.st tr:hover td{background:var(--bg)}
+.quiz-wrap{background:var(--white);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin:22px 0}
+.quiz-wrap h3{font-size:15px;color:var(--dark);margin-bottom:14px}
+.qi{margin-bottom:18px}
+.qi .qt{font-size:14px;color:var(--text);margin-bottom:9px;font-weight:600}
+.qi label{display:flex;align-items:flex-start;gap:9px;padding:7px 11px;border-radius:6px;cursor:pointer;font-size:13.5px;color:var(--text2);border:1.5px solid transparent;transition:.15s;margin-bottom:5px}
+.qi label:hover{background:var(--pale);border-color:var(--light)}
+.qi input[type=radio]{margin-top:2px;accent-color:var(--primary)}
+.qi label.correct{background:#d1fae5;border-color:#059669;color:#064e3b}
+.qi label.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+.qi .explain{font-size:13px;color:var(--text2);background:var(--pale);border-radius:4px;padding:7px 11px;margin-top:5px;display:none}
+.qbtn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit;transition:.15s}
+.qbtn:hover{background:var(--dark)}
+.qres{font-weight:700;margin-top:10px;font-size:15px;color:var(--primary)}
+.day-nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:18px;border-top:1px solid var(--pale)}
+.day-nav a{background:var(--primary);color:#fff;text-decoration:none;padding:9px 20px;border-radius:6px;font-size:13px;transition:.15s}
+.day-nav a:hover{background:var(--dark)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--white);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border-top:3px solid var(--pale);text-decoration:none;transition:.15s;display:block}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,123,58,.18);border-top-color:var(--primary)}
+.card h3{font-size:13.5px;color:var(--dark);margin-bottom:5px}
+.card p{font-size:12px;color:var(--text2);line-height:1.5}
+.card .tag{display:inline-block;background:var(--pale);color:var(--primary);font-size:11px;padding:2px 8px;border-radius:10px;margin-top:7px;font-weight:600}
+@media(max-width:800px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:10px}.sidebar a{padding:5px 10px;border-left:none;font-size:12px}.main{padding:18px}}
+</style></head><body>
+<nav class="topnav">
+  <a class="logo" href="../index.html">SAP <span>GR</span> 学习营</a>
+  <nav><a href="../index.html">课程首页</a><a href="../week1/day1.html" class="active">Week 1</a><a href="../week2/day8.html">Week 2</a></nav>
+</nav>
+<div class="layout">
+<div class="sidebar">
+  <div class="wk">第一周 · 理论学习</div>
+  <a href="../week1/day1.html"><span class="dn">D1</span>什么是Group Reporting？</a>
+  <a href="../week1/day2.html"><span class="dn">D2</span>集团架构与合并单元</a>
+  <a href="../week1/day3.html"><span class="dn">D3</span>集团科目表与主数据</a>
+  <a href="../week1/day4.html"><span class="dn">D4</span>数据采集与GRDC 📹</a>
+  <a href="../week1/day5.html" class="active"><span class="dn">D5</span>合并准备：数据监控器</a>
+  <a href="../week1/day6.html"><span class="dn">D6</span>内部交易消除（ICMR）</a>
+  <a href="../week1/day7.html"><span class="dn">D7</span>合并流程与报表 📹</a>
+  <div class="wk">第二周 · 华照合并实战</div>
+  <div class="sep"></div>
+  <a href="../week2/day8.html"><span class="dn">D8</span>案例介绍：华照集团</a>
+  <a href="../week2/day9.html"><span class="dn">D9</span>集团架构配置实战</a>
+  <a href="../week2/day10.html"><span class="dn">D10</span>科目映射与GRDC实战</a>
+  <a href="../week2/day11.html"><span class="dn">D11</span>内部交易消除实战</a>
+  <a href="../week2/day12.html"><span class="dn">D12</span>合并月结与验收</a>
+</div>
+<div class="main">
+<div class="bc"><a href="../index.html">课程首页</a> / Week 1 · 理论学习 / Day 5</div>
+<div class="hero">
+  <h1>Day 5 · 合并准备：数据监控器</h1>
+  <div class="sub">Data Monitor全流程、Release Universal Journal（2402 UX改进）、货币折算方法（Y0901/Y0902/S0903）</div>
+  <div class="meta"><span class="badge">⏱ 约50分钟</span><span class="badge">📖 合并准备</span></div>
+</div>
+
+<h2 class="sec">5.1 数据监控器（Data Monitor）</h2>
+<p class="b">数据监控器是<strong>法人层面</strong>的合并准备中心，负责监督每个合并单元的数据准备状态。以下是完整的任务执行顺序：</p>
+<div class="flow">
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">🔄</div><div class="flow-label">余额结转</div><div class="flow-sub">Balance<br>Carryforward</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">📤</div><div class="flow-label">发布凭证</div><div class="flow-sub">Release UJ<br>（ACDOCA→ACDOCU）</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">✅</div><div class="flow-label">校验</div><div class="flow-sub">Validate<br>Reported Data</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#a8d5b5;font-size:14px">💱</div><div class="flow-label">货币折算</div><div class="flow-sub">Currency<br>Translation</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">🔍</div><div class="flow-label">校验标准数据</div><div class="flow-sub">Validate<br>Standardized</div></div>
+</div>
+
+<h2 class="sec">5.2 Release Universal Journal（发布通用日记账）</h2>
+<p class="b">Release UJ 是数据监控器中最核心的任务——将 ACDOCA（会计核算）数据发布到 ACDOCU（集团合并）。</p>
+<p class="b">SAP Feature Deck 2402 重大 UX 改进：</p>
+<table class="st">
+<tr><th>模式</th><th>2402前</th><th>2402后</th></tr>
+<tr><td>Update（正式发布）</td><td>复杂选择界面</td><td>几乎"一键操作"：确认弹窗后立即执行</td></tr>
+<tr><td>Test（测试模式）</td><td>只能逐个合并单元测试</td><td>支持多个合并单元同时测试</td></tr>
+<tr><td>Delta for Period</td><td>仅 GRPL 集成可用</td><td>2402起也支持传统会计集成</td></tr>
+<tr><td>Start with Selection</td><td>不存在</td><td>新增：唯一需要选择界面的模式</td></tr>
+</table>
+
+<h2 class="sec">5.3 货币折算方法</h2>
+<p class="b">华照集团有泰国（THB）和德国（EUR）两个境外法人，货币折算是关键步骤。SAP 预置方法（来源：Feature Deck Slide 54）：</p>
+<table class="st">
+<tr><th>方法代码</th><th>名称</th><th>适用场景</th></tr>
+<tr><td>Y0901</td><td>Standard YTD（标准年累计）</td><td>最常用，按年累计金额折算</td></tr>
+<tr><td>Y0902</td><td>Keep GC from S4 / B/S retranslate @ closing</td><td>保留 S4 中的集团货币值，期末重新折算 B/S</td></tr>
+<tr><td>S0901</td><td>Period of acquisition YTD</td><td>并购期间年累计</td></tr>
+<tr><td>S0903</td><td>Standard Periodic（标准分期）</td><td>按期间分别折算</td></tr>
+</table>
+<div class="box blue"><strong>华照泰国FZ40（THB）折算策略：</strong>B/S 科目用期末汇率折算（现行汇率法）；P&L 科目用平均汇率折算；汇兑差异记入权益项目（OCI）。德国FZ33（EUR）同样适用，需在合并单元主数据中为每个法人单独配置折算方法。</div>
+
+<div class="quiz-wrap" id="q5"><h3>📝 知识测验 — Day 5</h3>
+<div class="qi" data-answer="1"><div class="qt">Q1. 数据监控器（Data Monitor）主要管理什么层面的合并任务？</div>
+<label><input type="radio" name="q5q1" value="0">集团层面的IC消除</label>
+<label><input type="radio" name="q5q1" value="1">法人层面（合并单元）的数据准备，包括数据采集、校验、货币折算</label>
+<label><input type="radio" name="q5q1" value="2">集团报表的生成和分发</label>
+<label><input type="radio" name="q5q1" value="3">审计日志管理</label>
+<div class="explain">✅ Data Monitor（数据监控器）负责单个合并单元（法人）的数据准备流程。Consolidation Monitor（合并监视器）才负责集团层面的消除任务（IC消除、投资消除等）。两者分工明确：Data Monitor 是"各家公司准备好自己的数据"，Consolidation Monitor 是"集团层面做消除"。</div></div>
+<div class="qi" data-answer="2"><div class="qt">Q2. 华照泰国 FZ40 使用泰铢（THB），在集团合并报表中需要转换为人民币（CNY）。B/S 科目应该用什么汇率折算？</div>
+<label><input type="radio" name="q5q2" value="0">历史汇率（入账时的汇率）</label>
+<label><input type="radio" name="q5q2" value="1">年平均汇率</label>
+<label><input type="radio" name="q5q2" value="2">期末即期汇率（现行汇率法，Closing Rate）</label>
+<label><input type="radio" name="q5q2" value="3">固定汇率（预算汇率）</label>
+<div class="explain">✅ 按 IFRS/CAS 准则，现行汇率法下：B/S 科目（资产、负债、权益）用期末即期汇率折算；P&L 科目用业务发生时的即期汇率（实务中通常用平均汇率近似）；折算差额计入其他综合收益（OCI）。这是 SAP GR 的默认设置，通过配置货币折算方法（Y0901等）实现。</div></div>
+<div class="qi" data-answer="0"><div class="qt">Q3. 2402 版本的 Release Universal Journal"Update 模式"有什么变化？</div>
+<label><input type="radio" name="q5q3" value="0">简化为近乎"一键操作"：选择 Update 后仅弹出确认窗口，然后立即执行，无需复杂的选择界面</label>
+<label><input type="radio" name="q5q3" value="1">完全废除了 Update 模式</label>
+<label><input type="radio" name="q5q3" value="2">新增了批量定时任务功能</label>
+<label><input type="radio" name="q5q3" value="3">不再需要确认直接执行</label>
+<div class="explain">✅ 2402 Feature Deck 明确：Update 模式变为"几乎一键操作"——选择 Update 后弹出确认窗口，用户确认后系统立即在更新模式下执行，不再显示复杂的选择界面。所有高级选项（如子集选择）移到了新的"Start with Selection"模式中。</div></div>
+<button class="qbtn" onclick="submitQuiz('q5')">提交答案</button><div class="qres"></div></div>
+<div class="day-nav"><a href="day4.html">&larr; Day 4</a><div style="flex:1"></div><a href="day6.html">Day 6 &rarr;</a></div>
+</div></div>
+<script>
+function submitQuiz(id){
+  const w=document.getElementById(id);let score=0,total=0;
+  w.querySelectorAll('.qi').forEach(function(q){
+    total++;const ans=parseInt(q.dataset.answer);
+    const sel=q.querySelector('input:checked');
+    const ex=q.querySelector('.explain');
+    q.querySelectorAll('label').forEach(function(l){l.classList.remove('correct','wrong');});
+    if(sel){const v=parseInt(sel.value);const labels=q.querySelectorAll('label');
+      if(v===ans){score++;labels[ans].classList.add('correct');}
+      else{labels[v].classList.add('wrong');labels[ans].classList.add('correct');}}
+    else{q.querySelectorAll('label')[ans].classList.add('correct');}
+    if(ex)ex.style.display='block';
+  });
+  const r=w.querySelector('.qres');
+  if(r)r.textContent='得分：'+score+'/'+total+(score===total?' 🎉 全部正确！':' — 建议复习解析后重试');
+}
+</script></body></html>

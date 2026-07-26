@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day 10 · 科目映射与GRDC实战 · SAP GR学习营</title>
+<style>
+:root{--navy:#054D25;--dark:#0A6B35;--primary:#0F7B3A;--mid:#1A9948;--steel:#4A8F65;--muted:#5B8C6B;--light:#A8D5B5;--pale:#D0EDD8;--bg:#EBF7EF;--white:#FFFFFF;--text:#0D2A18;--text2:#1F3D2C;--r:8px;--shadow:0 2px 12px rgba(15,123,58,.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.topnav{background:var(--dark);padding:0 32px;display:flex;align-items:center;gap:24px;height:56px;position:sticky;top:0;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topnav .logo{color:#fff;font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}.topnav .logo span{color:var(--light)}
+.topnav nav{display:flex;gap:4px;margin-left:auto}
+.topnav nav a{color:var(--light);text-decoration:none;padding:6px 12px;border-radius:4px;font-size:13px;transition:.15s}
+.topnav nav a:hover,.topnav nav a.active{background:var(--primary);color:#fff}
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:252px;min-width:252px;background:var(--dark);padding:20px 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+.sidebar .wk{color:var(--light);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 18px 4px}
+.sidebar a{display:flex;align-items:center;gap:9px;color:var(--pale);text-decoration:none;padding:9px 18px;font-size:13px;border-left:3px solid transparent;transition:.15s}
+.sidebar a:hover{background:rgba(255,255,255,.07);border-left-color:var(--light)}
+.sidebar a.active{background:rgba(15,123,58,.28);border-left-color:var(--primary);color:#fff}
+.sidebar .dn{background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.sidebar .sep{height:1px;background:rgba(255,255,255,.08);margin:8px 14px}
+.main{flex:1;padding:32px 40px;max-width:920px}
+.hero{background:linear-gradient(135deg,#003087 0%,var(--dark) 55%,var(--primary) 100%);border-radius:var(--r);padding:36px 40px 28px;color:#fff;margin-bottom:28px;border-bottom:3px solid var(--primary)}
+.hero h1{font-size:24px;margin-bottom:8px;line-height:1.35}
+.hero .sub{color:var(--pale);font-size:13.5px;max-width:640px}
+.hero .meta{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.hero .badge{background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;font-size:12px;color:var(--pale)}
+.bc{font-size:12px;color:var(--muted);margin-bottom:18px}
+.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--primary)}
+h2.sec{font-size:19px;color:var(--dark);border-left:4px solid var(--primary);padding-left:12px;margin:28px 0 14px}
+h3.sub{font-size:14.5px;color:var(--primary);margin:18px 0 8px;font-weight:700}
+p.b{font-size:14px;color:var(--text2);margin-bottom:11px;line-height:1.78}
+ul.b{font-size:14px;color:var(--text2);padding-left:20px;margin-bottom:12px;line-height:1.8}
+.box{border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13.5px;line-height:1.72}
+.box.blue{background:var(--pale);border-left:4px solid var(--primary);color:var(--text)}
+.box.green{background:#d1fae5;border-left:4px solid #059669;color:#064e3b}
+.box.amber{background:#fef3c7;border-left:4px solid #d97706;color:#78350f}
+.box.red{background:#fee2e2;border-left:4px solid #dc2626;color:#7f1d1d}
+.flow{display:flex;align-items:flex-start;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 0 12px;margin:18px 0}
+.flow-node{display:flex;flex-direction:column;align-items:center;min-width:88px}
+.flow-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;flex-shrink:0}
+.flow-label{font-size:10px;font-weight:700;color:var(--dark);margin-top:7px;text-align:center}
+.flow-sub{font-size:9px;color:var(--muted);text-align:center;margin-top:2px;line-height:1.4}
+.flow-arrow{display:flex;flex-direction:column;align-items:center;padding-top:14px;min-width:32px}
+.flow-arrow-sym{font-size:16px;color:var(--primary);font-weight:700}
+.flow-arrow-lbl{font-size:8px;color:var(--muted);text-align:center;margin-top:1px;line-height:1.3}
+table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 18px;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+table.st th{background:var(--dark);color:#fff;padding:10px 14px;text-align:left}
+table.st td{padding:9px 14px;border-bottom:1px solid var(--pale);color:var(--text2)}
+table.st tr:last-child td{border-bottom:none}
+table.st tr:hover td{background:var(--bg)}
+.quiz-wrap{background:var(--white);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin:22px 0}
+.quiz-wrap h3{font-size:15px;color:var(--dark);margin-bottom:14px}
+.qi{margin-bottom:18px}
+.qi .qt{font-size:14px;color:var(--text);margin-bottom:9px;font-weight:600}
+.qi label{display:flex;align-items:flex-start;gap:9px;padding:7px 11px;border-radius:6px;cursor:pointer;font-size:13.5px;color:var(--text2);border:1.5px solid transparent;transition:.15s;margin-bottom:5px}
+.qi label:hover{background:var(--pale);border-color:var(--light)}
+.qi input[type=radio]{margin-top:2px;accent-color:var(--primary)}
+.qi label.correct{background:#d1fae5;border-color:#059669;color:#064e3b}
+.qi label.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+.qi .explain{font-size:13px;color:var(--text2);background:var(--pale);border-radius:4px;padding:7px 11px;margin-top:5px;display:none}
+.qbtn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit;transition:.15s}
+.qbtn:hover{background:var(--dark)}
+.qres{font-weight:700;margin-top:10px;font-size:15px;color:var(--primary)}
+.day-nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:18px;border-top:1px solid var(--pale)}
+.day-nav a{background:var(--primary);color:#fff;text-decoration:none;padding:9px 20px;border-radius:6px;font-size:13px;transition:.15s}
+.day-nav a:hover{background:var(--dark)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--white);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border-top:3px solid var(--pale);text-decoration:none;transition:.15s;display:block}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,123,58,.18);border-top-color:var(--primary)}
+.card h3{font-size:13.5px;color:var(--dark);margin-bottom:5px}
+.card p{font-size:12px;color:var(--text2);line-height:1.5}
+.card .tag{display:inline-block;background:var(--pale);color:var(--primary);font-size:11px;padding:2px 8px;border-radius:10px;margin-top:7px;font-weight:600}
+@media(max-width:800px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:10px}.sidebar a{padding:5px 10px;border-left:none;font-size:12px}.main{padding:18px}}
+</style></head><body>
+<nav class="topnav"><a class="logo" href="../index.html">SAP <span>GR</span> 学习营</a><nav><a href="../index.html">课程首页</a><a href="../week1/day1.html">Week 1</a><a href="../week2/day8.html" class="active">Week 2</a></nav></nav>
+<div class="layout"><div class="sidebar">
+  <div class="wk">第一周 · 理论学习</div>
+  <a href="../week1/day1.html"><span class="dn">D1</span>什么是Group Reporting？</a>
+  <a href="../week1/day2.html"><span class="dn">D2</span>集团架构与合并单元</a>
+  <a href="../week1/day3.html"><span class="dn">D3</span>集团科目表与主数据</a>
+  <a href="../week1/day4.html"><span class="dn">D4</span>数据采集与GRDC 📹</a>
+  <a href="../week1/day5.html"><span class="dn">D5</span>合并准备：数据监控器</a>
+  <a href="../week1/day6.html"><span class="dn">D6</span>内部交易消除（ICMR）</a>
+  <a href="../week1/day7.html"><span class="dn">D7</span>合并流程与报表 📹</a>
+  <div class="wk">第二周 · 华照合并实战</div><div class="sep"></div>
+  <a href="day8.html"><span class="dn">D8</span>案例介绍：华照集团</a>
+  <a href="day9.html"><span class="dn">D9</span>集团架构配置实战</a>
+  <a href="day10.html" class="active"><span class="dn">D10</span>科目映射与GRDC实战</a>
+  <a href="day11.html"><span class="dn">D11</span>内部交易消除实战</a>
+  <a href="day12.html"><span class="dn">D12</span>合并月结与验收</a>
+</div>
+<div class="main">
+<div class="bc"><a href="../index.html">课程首页</a> / Week 2 · 华照合并实战 / Day 10</div>
+<div class="hero"><h1>Day 10 · 科目映射与GRDC实战</h1><div class="sub">5套本地科目表→集团FS Item映射、沪乐GRDC Data Mapping配置、数据质量检查</div><div class="meta"><span class="badge">⏱ 约60分钟</span><span class="badge">🔧 动手配置</span></div></div>
+
+<h2 class="sec">10.1 华照科目映射挑战</h2>
+<div class="box red"><strong>实际挑战：</strong>华照19家法人历史上各自建账，形成了5套不同的本地科目表（YCOA）。其中：<br>
+• 佛山总部 + 大部分子公司：使用国标科目体系<br>
+• 沪乐（沪乐原账套）：用友U8特有科目<br>
+• 泰国FZ40：泰国本地科目体系<br>
+• 德国FZ33：德国 SKR04 科目体系</div>
+
+<h2 class="sec">10.2 FS Item 映射配置步骤</h2>
+<p class="b">在 Fiori「Define FS Item Mapping」App 中为每套本地科目表创建映射规则：</p>
+<table class="st">
+<tr><th>本地科目（Local GL）</th><th>所属科目表</th><th>集团 FS Item</th><th>说明</th></tr>
+<tr><td>1131xx（应收账款系列）</td><td>佛山总部 YCOA</td><td>110001</td><td>应收账款集团科目</td></tr>
+<tr><td>11010000（泰国应收）</td><td>泰国 THAI</td><td>110001</td><td>同一集团科目</td></tr>
+<tr><td>140000（德国应收）</td><td>德国 SKR04</td><td>110001</td><td>同一集团科目</td></tr>
+<tr><td>1122（沪乐应收，用友）</td><td>沪乐 YYLF</td><td>110001</td><td>通过GRDC映射</td></tr>
+<tr><td>6001xx（佛山销售收入）</td><td>佛山总部 YCOA</td><td>500001</td><td>销售收入集团科目</td></tr>
+</table>
+<div class="box blue"><strong>最佳实践：</strong>先配置最大法人（佛山总部）的映射，验证通过后，其他法人的类似科目复用相同 FS Item，差异科目单独处理。MDG-F 负责集团科目表维护（唯一写入点，IS-01 原则）。</div>
+
+<h2 class="sec">10.3 沪乐 GRDC Data Mapping 配置</h2>
+<p class="b">沪乐（用友U8）数据通过 GRDC 文件上载纳入合并：</p>
+<div class="flow">
+<div class="flow-node"><div class="flow-icon" style="background:#fef9c3;font-size:14px">📄</div><div class="flow-label">用友U8导出</div><div class="flow-sub">Excel科目余额表<br>每月提供</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">⚙️</div><div class="flow-label">GRDC Mapping</div><div class="flow-sub">科目映射规则<br>自动转换</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#a8d5b5;font-size:14px">📊</div><div class="flow-label">ACDOCU</div><div class="flow-sub">沪乐数据<br>写入合并系统</div></div>
+</div>
+<p class="b">GRDC Mapping 配置要点：</p>
+<ul class="b">
+<li>Source：用友U8导出的 Excel 文件（固定列格式：科目号/余额/期间）</li>
+<li>Target：ACDOCU，写入 Cons Unit = HXLU，Posting Level = 00</li>
+<li>Mapping Rules：用友科目 → 集团 FS Item 的对应关系（与第10.2节对应）</li>
+<li>Traceability Log：启用，便于审计追溯（2402新功能）</li>
+</ul>
+
+<h2 class="sec">10.4 数据质量检查</h2>
+<table class="st">
+<tr><th>检查项</th><th>工具</th><th>华照典型问题</th></tr>
+<tr><td>未映射科目</td><td>Data Monitor 校验任务</td><td>历史上各公司各自新增科目未同步到集团映射规则</td></tr>
+<tr><td>借贷方向</td><td>FS Item 属性配置</td><td>泰国科目与国内相反的科目（偶见）</td></tr>
+<tr><td>B/S 平衡</td><td>Validate Reported Data</td><td>沪乐文件手工录入可能导致科目借贷不平</td></tr>
+<tr><td>期间一致性</td><td>Consistency Check</td><td>沪乐 Excel 数据与 S/4HANA 法人期间不一致</td></tr>
+</table>
+
+<div class="quiz-wrap" id="q10"><h3>📝 知识测验 — Day 10</h3>
+<div class="qi" data-answer="2"><div class="qt">Q1. 华照泰国 FZ40 的应收账款科目 11010000 和佛山总部的 113100 都映射到了集团 FS Item 110001，在合并 B/S 中会怎样显示？</div>
+<label><input type="radio" name="q10q1" value="0">分别在 B/S 中各显示一行</label>
+<label><input type="radio" name="q10q1" value="1">显示两行，但标注来自不同法人</label>
+<label><input type="radio" name="q10q1" value="2">合并显示在同一行（FS Item 110001），两个法人的余额汇总在一起（但可以按 Cons Unit 下钻明细）</label>
+<label><input type="radio" name="q10q1" value="3">泰国数据因为是外币，单独显示</label>
+<div class="explain">✅ FS Item Mapping 的核心价值：不同法人、不同本地科目，只要映射到同一个 FS Item，就在合并报表中汇总到同一行。这样不管佛山用科目 113100 还是泰国用 11010000，合并 B/S 都在"应收账款"行（FS Item 110001）汇总显示总金额。下钻时可按 Cons Unit 查看各法人明细。</div></div>
+<div class="qi" data-answer="1"><div class="qt">Q2. 在 GRDC 数据采集中，沪乐提交的 Excel 余额表经过 Data Mapping 后，写入 ACDOCU 的 Posting Level 是什么？</div>
+<label><input type="radio" name="q10q2" value="0">Posting Level 10（调整）</label>
+<label><input type="radio" name="q10q2" value="1">Posting Level 00（申报数据，Reported Data）</label>
+<label><input type="radio" name="q10q2" value="2">Posting Level 20（IC消除）</label>
+<label><input type="radio" name="q10q2" value="3">Posting Level 30（集团层调整）</label>
+<div class="explain">✅ 无论数据来源是 S/4HANA 直接集成、API 推送、还是 GRDC 文件上载，法人的原始申报数据都写入 Posting Level 00（Reported Data）。这是 Group Reporting 数据层级的基础，后续的调整（PL10）、IC消除（PL20）、集团调整（PL30）都建立在 PL00 数据之上。</div></div>
+<div class="qi" data-answer="0"><div class="qt">Q3. 配置科目映射时发现沪乐有一个科目 2109（应付账款-关联方）没有对应的集团 FS Item，应该怎么处理？</div>
+<label><input type="radio" name="q10q3" value="0">在 MDG-F 中创建新的集团 FS Item（如 220002-应付账款关联方），然后建立映射；如果金额不重要可暂时映射到通用应付科目 220001</label>
+<label><input type="radio" name="q10q3" value="1">忽略这个科目，不影响合并</label>
+<label><input type="radio" name="q10q3" value="2">让沪乐更改用友科目编号</label>
+<label><input type="radio" name="q10q3" value="3">直接在 GRDC 中删除这个科目的余额</label>
+<div class="explain">✅ 发现未映射科目是正常情况，处理流程：① 评估重要性（金额大 → 必须单独映射；金额小且可合并 → 映射到通用科目）；② 在 MDG-F 中创建或确认目标 FS Item；③ 在 Mapping Rules 中添加新映射。切忌忽略未映射科目，Data Monitor 的校验任务会标红报错，阻止数据流向下游合并步骤。</div></div>
+<button class="qbtn" onclick="submitQuiz('q10')">提交答案</button><div class="qres"></div></div>
+<div class="day-nav"><a href="day9.html">&larr; Day 9</a><div style="flex:1"></div><a href="day11.html">Day 11 &rarr;</a></div>
+</div></div><script>
+function submitQuiz(id){
+  const w=document.getElementById(id);let score=0,total=0;
+  w.querySelectorAll('.qi').forEach(function(q){
+    total++;const ans=parseInt(q.dataset.answer);
+    const sel=q.querySelector('input:checked');
+    const ex=q.querySelector('.explain');
+    q.querySelectorAll('label').forEach(function(l){l.classList.remove('correct','wrong');});
+    if(sel){const v=parseInt(sel.value);const labels=q.querySelectorAll('label');
+      if(v===ans){score++;labels[ans].classList.add('correct');}
+      else{labels[v].classList.add('wrong');labels[ans].classList.add('correct');}}
+    else{q.querySelectorAll('label')[ans].classList.add('correct');}
+    if(ex)ex.style.display='block';
+  });
+  const r=w.querySelector('.qres');
+  if(r)r.textContent='得分：'+score+'/'+total+(score===total?' 🎉 全部正确！':' — 建议复习解析后重试');
+}
+</script></body></html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day 9 · 集团架构配置实战 · SAP GR学习营</title>
+<style>
+:root{--navy:#054D25;--dark:#0A6B35;--primary:#0F7B3A;--mid:#1A9948;--steel:#4A8F65;--muted:#5B8C6B;--light:#A8D5B5;--pale:#D0EDD8;--bg:#EBF7EF;--white:#FFFFFF;--text:#0D2A18;--text2:#1F3D2C;--r:8px;--shadow:0 2px 12px rgba(15,123,58,.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.topnav{background:var(--dark);padding:0 32px;display:flex;align-items:center;gap:24px;height:56px;position:sticky;top:0;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topnav .logo{color:#fff;font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}.topnav .logo span{color:var(--light)}
+.topnav nav{display:flex;gap:4px;margin-left:auto}
+.topnav nav a{color:var(--light);text-decoration:none;padding:6px 12px;border-radius:4px;font-size:13px;transition:.15s}
+.topnav nav a:hover,.topnav nav a.active{background:var(--primary);color:#fff}
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:252px;min-width:252px;background:var(--dark);padding:20px 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+.sidebar .wk{color:var(--light);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 18px 4px}
+.sidebar a{display:flex;align-items:center;gap:9px;color:var(--pale);text-decoration:none;padding:9px 18px;font-size:13px;border-left:3px solid transparent;transition:.15s}
+.sidebar a:hover{background:rgba(255,255,255,.07);border-left-color:var(--light)}
+.sidebar a.active{background:rgba(15,123,58,.28);border-left-color:var(--primary);color:#fff}
+.sidebar .dn{background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.sidebar .sep{height:1px;background:rgba(255,255,255,.08);margin:8px 14px}
+.main{flex:1;padding:32px 40px;max-width:920px}
+.hero{background:linear-gradient(135deg,#003087 0%,var(--dark) 55%,var(--primary) 100%);border-radius:var(--r);padding:36px 40px 28px;color:#fff;margin-bottom:28px;border-bottom:3px solid var(--primary)}
+.hero h1{font-size:24px;margin-bottom:8px;line-height:1.35}
+.hero .sub{color:var(--pale);font-size:13.5px;max-width:640px}
+.hero .meta{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.hero .badge{background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;font-size:12px;color:var(--pale)}
+.bc{font-size:12px;color:var(--muted);margin-bottom:18px}
+.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--primary)}
+h2.sec{font-size:19px;color:var(--dark);border-left:4px solid var(--primary);padding-left:12px;margin:28px 0 14px}
+h3.sub{font-size:14.5px;color:var(--primary);margin:18px 0 8px;font-weight:700}
+p.b{font-size:14px;color:var(--text2);margin-bottom:11px;line-height:1.78}
+ul.b{font-size:14px;color:var(--text2);padding-left:20px;margin-bottom:12px;line-height:1.8}
+.box{border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13.5px;line-height:1.72}
+.box.blue{background:var(--pale);border-left:4px solid var(--primary);color:var(--text)}
+.box.green{background:#d1fae5;border-left:4px solid #059669;color:#064e3b}
+.box.amber{background:#fef3c7;border-left:4px solid #d97706;color:#78350f}
+.box.red{background:#fee2e2;border-left:4px solid #dc2626;color:#7f1d1d}
+.flow{display:flex;align-items:flex-start;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 0 12px;margin:18px 0}
+.flow-node{display:flex;flex-direction:column;align-items:center;min-width:88px}
+.flow-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;flex-shrink:0}
+.flow-label{font-size:10px;font-weight:700;color:var(--dark);margin-top:7px;text-align:center}
+.flow-sub{font-size:9px;color:var(--muted);text-align:center;margin-top:2px;line-height:1.4}
+.flow-arrow{display:flex;flex-direction:column;align-items:center;padding-top:14px;min-width:32px}
+.flow-arrow-sym{font-size:16px;color:var(--primary);font-weight:700}
+.flow-arrow-lbl{font-size:8px;color:var(--muted);text-align:center;margin-top:1px;line-height:1.3}
+table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 18px;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+table.st th{background:var(--dark);color:#fff;padding:10px 14px;text-align:left}
+table.st td{padding:9px 14px;border-bottom:1px solid var(--pale);color:var(--text2)}
+table.st tr:last-child td{border-bottom:none}
+table.st tr:hover td{background:var(--bg)}
+.quiz-wrap{background:var(--white);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin:22px 0}
+.quiz-wrap h3{font-size:15px;color:var(--dark);margin-bottom:14px}
+.qi{margin-bottom:18px}
+.qi .qt{font-size:14px;color:var(--text);margin-bottom:9px;font-weight:600}
+.qi label{display:flex;align-items:flex-start;gap:9px;padding:7px 11px;border-radius:6px;cursor:pointer;font-size:13.5px;color:var(--text2);border:1.5px solid transparent;transition:.15s;margin-bottom:5px}
+.qi label:hover{background:var(--pale);border-color:var(--light)}
+.qi input[type=radio]{margin-top:2px;accent-color:var(--primary)}
+.qi label.correct{background:#d1fae5;border-color:#059669;color:#064e3b}
+.qi label.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+.qi .explain{font-size:13px;color:var(--text2);background:var(--pale);border-radius:4px;padding:7px 11px;margin-top:5px;display:none}
+.qbtn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit;transition:.15s}
+.qbtn:hover{background:var(--dark)}
+.qres{font-weight:700;margin-top:10px;font-size:15px;color:var(--primary)}
+.day-nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:18px;border-top:1px solid var(--pale)}
+.day-nav a{background:var(--primary);color:#fff;text-decoration:none;padding:9px 20px;border-radius:6px;font-size:13px;transition:.15s}
+.day-nav a:hover{background:var(--dark)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--white);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border-top:3px solid var(--pale);text-decoration:none;transition:.15s;display:block}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,123,58,.18);border-top-color:var(--primary)}
+.card h3{font-size:13.5px;color:var(--dark);margin-bottom:5px}
+.card p{font-size:12px;color:var(--text2);line-height:1.5}
+.card .tag{display:inline-block;background:var(--pale);color:var(--primary);font-size:11px;padding:2px 8px;border-radius:10px;margin-top:7px;font-weight:600}
+@media(max-width:800px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:10px}.sidebar a{padding:5px 10px;border-left:none;font-size:12px}.main{padding:18px}}
+</style></head><body>
+<nav class="topnav"><a class="logo" href="../index.html">SAP <span>GR</span> 学习营</a><nav><a href="../index.html">课程首页</a><a href="../week1/day1.html">Week 1</a><a href="../week2/day8.html" class="active">Week 2</a></nav></nav>
+<div class="layout"><div class="sidebar">
+  <div class="wk">第一周 · 理论学习</div>
+  <a href="../week1/day1.html"><span class="dn">D1</span>什么是Group Reporting？</a>
+  <a href="../week1/day2.html"><span class="dn">D2</span>集团架构与合并单元</a>
+  <a href="../week1/day3.html"><span class="dn">D3</span>集团科目表与主数据</a>
+  <a href="../week1/day4.html"><span class="dn">D4</span>数据采集与GRDC 📹</a>
+  <a href="../week1/day5.html"><span class="dn">D5</span>合并准备：数据监控器</a>
+  <a href="../week1/day6.html"><span class="dn">D6</span>内部交易消除（ICMR）</a>
+  <a href="../week1/day7.html"><span class="dn">D7</span>合并流程与报表 📹</a>
+  <div class="wk">第二周 · 华照合并实战</div><div class="sep"></div>
+  <a href="day8.html"><span class="dn">D8</span>案例介绍：华照集团</a>
+  <a href="day9.html" class="active"><span class="dn">D9</span>集团架构配置实战</a>
+  <a href="day10.html"><span class="dn">D10</span>科目映射与GRDC实战</a>
+  <a href="day11.html"><span class="dn">D11</span>内部交易消除实战</a>
+  <a href="day12.html"><span class="dn">D12</span>合并月结与验收</a>
+</div>
+<div class="main">
+<div class="bc"><a href="../index.html">课程首页</a> / Week 2 · 华照合并实战 / Day 9</div>
+<div class="hero"><h1>Day 9 · 集团架构配置实战</h1><div class="sub">Consolidation Group/Unit创建、15法人映射、3级股权层级、NCI配置、Fiori App操作指引</div><div class="meta"><span class="badge">⏱ 约60分钟</span><span class="badge">🔧 动手配置</span></div></div>
+
+<h2 class="sec">9.1 配置步骤总览</h2>
+<div class="flow">
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">⚙️</div><div class="flow-label">Step 1</div><div class="flow-sub">创建 Consolidation<br>Group（华照集团）</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">🏢</div><div class="flow-label">Step 2</div><div class="flow-sub">创建 15 个<br>Consolidation Units</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">🔗</div><div class="flow-label">Step 3</div><div class="flow-sub">配置股权层级<br>（3级结构）</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#a8d5b5;font-size:14px">💰</div><div class="flow-label">Step 4</div><div class="flow-sub">配置 NCI<br>（3家少数股东）</div></div>
+</div>
+
+<h2 class="sec">9.2 Step 1：创建合并组（Consolidation Group）</h2>
+<p class="b">使用 Fiori App「管理合并组」（Manage Consolidation Groups）：</p>
+<table class="st">
+<tr><th>字段</th><th>值</th><th>说明</th></tr>
+<tr><td>Consolidation Group ID</td><td>HZJT</td><td>华照集团缩写</td></tr>
+<tr><td>Consolidation Group Name</td><td>华照集团（总部）</td><td>对外显示名称</td></tr>
+<tr><td>Currency</td><td>CNY</td><td>集团报告货币：人民币</td></tr>
+<tr><td>Fiscal Year Variant</td><td>V3</td><td>华照财年：1月-12月</td></tr>
+<tr><td>Chart of Accounts</td><td>GCOA</td><td>集团统一科目表（待Day10配置）</td></tr>
+</table>
+
+<h2 class="sec">9.3 Step 2：创建合并单元（Consolidation Units）</h2>
+<p class="b">15 个合并单元的关键配置（节选代表性法人）：</p>
+<table class="st">
+<tr><th>Cons Unit ID</th><th>法人名称</th><th>Company Code</th><th>本位币</th><th>折算方法</th></tr>
+<tr><td>FZ01</td><td>佛山总部</td><td>FZ01</td><td>CNY</td><td>无需折算</td></tr>
+<tr><td>FZ13</td><td>高明分公司</td><td>FZ13</td><td>CNY</td><td>无需折算</td></tr>
+<tr><td>FZ40</td><td>泰国华照</td><td>FZ40</td><td>THB</td><td>Y0901（标准YTD）</td></tr>
+<tr><td>FZ33</td><td>德国华照</td><td>FZ33</td><td>EUR</td><td>Y0901（标准YTD）</td></tr>
+<tr><td>HXLU</td><td>沪乐（用友U8）</td><td>（非S4，GRDC采集）</td><td>CNY</td><td>无需折算</td></tr>
+</table>
+<div class="box amber"><strong>沪乐特殊处理：</strong>沪乐使用用友U8，没有对应的 S/4HANA Company Code。配置 Cons Unit 时，Data Collection Selection 选择「GRDC」而非「Universal Journal Integration」，表明数据从 GRDC 文件上载而非 S/4HANA 直接读取。</div>
+
+<h2 class="sec">9.4 Step 3：配置股权层级（3级结构）</h2>
+<table class="st">
+<tr><th>层级</th><th>合并组/单元</th><th>上级节点</th><th>持股比例</th></tr>
+<tr><td>Level 1</td><td>华照集团（HZJT）</td><td>—</td><td>100%（顶层）</td></tr>
+<tr><td>Level 2</td><td>佛山总部（FZ01）</td><td>HZJT</td><td>100%</td></tr>
+<tr><td>Level 2</td><td>泰国华照（FZ40）</td><td>HZJT</td><td>100%</td></tr>
+<tr><td>Level 2</td><td>德国华照（FZ33）</td><td>HZJT</td><td>100%</td></tr>
+<tr><td>Level 3</td><td>沪乐（HXLU）</td><td>FZ01</td><td>70%（NCI 30%）</td></tr>
+<tr><td>Level 3</td><td>高明分公司（FZ13）</td><td>FZ01</td><td>100%</td></tr>
+</table>
+
+<h2 class="sec">9.5 Step 4：配置 NCI（少数股东权益）</h2>
+<p class="b">3家有 NCI 的合并单元需要单独配置，以便在合并报表中正确列示少数股东权益：</p>
+<ul class="b">
+<li><strong>沪乐（HXLU）：</strong>外部股东持股 30%，配置 NCI = 30%</li>
+<li>另外2家子公司：具体比例由项目方确认</li>
+</ul>
+<div class="box blue"><strong>验证步骤：</strong>配置完成后，在 Fiori「管理合并组」App 中检查：①所有15个 Cons Units 正确挂在组织树下；②股权层级显示正确（3级）；③NCI 标识的单元显示少数股东权益比例。</div>
+
+<div class="quiz-wrap" id="q9"><h3>📝 知识测验 — Day 9</h3>
+<div class="qi" data-answer="1"><div class="qt">Q1. 泰国华照（FZ40）使用泰铢（THB），在 Consolidation Unit 主数据中需要配置什么来处理货币折算？</div>
+<label><input type="radio" name="q9q1" value="0">在 Consolidation Group 中配置统一折算方法</label>
+<label><input type="radio" name="q9q1" value="1">在 FZ40 的 Consolidation Unit 主数据中配置 Currency Translation Method（如 Y0901），并设置本位币为 THB</label>
+<label><input type="radio" name="q9q1" value="2">货币折算不需要配置，系统自动处理</label>
+<label><input type="radio" name="q9q1" value="3">需要在 Consolidation Group 和 Consolidation Unit 各配置一次</label>
+<div class="explain">✅ 货币折算方法在每个合并单元（Cons Unit）主数据的时间版本属性中配置。FZ40 配置本位币 THB，折算方法 Y0901（标准年累计），GR 在执行货币折算任务时会自动按此方法将 THB 折算为集团货币 CNY。</div></div>
+<div class="qi" data-answer="2"><div class="qt">Q2. 沪乐（HXLU）使用用友U8，在创建 Consolidation Unit 时 Data Collection Selection 应该选什么？</div>
+<label><input type="radio" name="q9q2" value="0">Universal Journal Integration（ACDOCA直接集成）</label>
+<label><input type="radio" name="q9q2" value="1">API Push</label>
+<label><input type="radio" name="q9q2" value="2">GRDC（表示通过 GRDC 文件上载采集数据，而非 S/4HANA 直接读取）</label>
+<label><input type="radio" name="q9q2" value="3">Manual Posting Only</label>
+<div class="explain">✅ 沪乐没有 S/4HANA Company Code，不能使用 Universal Journal Integration。选择 GRDC 后，Data Monitor 中该合并单元不会出现 Release UJ 任务，而是出现 GRDC 数据采集任务。这样系统就知道沪乐的数据来自 GRDC 文件，而不是 S/4HANA 核算。</div></div>
+<div class="qi" data-answer="0"><div class="qt">Q3. 沪乐的 NCI（少数股东权益）配置为 30%，这意味着在合并 B/S 中如何体现？</div>
+<label><input type="radio" name="q9q3" value="0">沪乐全部净资产纳入合并，但在权益类科目中单独列示"少数股东权益 = 沪乐净资产 × 30%"，归属母公司权益 = 沪乐净资产 × 70%</label>
+<label><input type="radio" name="q9q3" value="1">只有 70% 的沪乐资产纳入合并 B/S</label>
+<label><input type="radio" name="q9q3" value="2">沪乐按权益法核算，不纳入合并</label>
+<label><input type="radio" name="q9q3" value="3">需要单独编制沪乐的合并报表</label>
+<div class="explain">✅ 控制原则（IFRS 10）：只要集团控制沪乐（持股70%即控制），就必须全额并入合并 B/S（不是按70%比例）。但在权益部分，必须拆分：① 归属母公司所有者权益（70%对应部分）；② 少数股东权益（30%对应部分）。两者之和等于沪乐的全部净资产。这是 SAP GR 中 COI 任务自动处理的核心逻辑。</div></div>
+<button class="qbtn" onclick="submitQuiz('q9')">提交答案</button><div class="qres"></div></div>
+<div class="day-nav"><a href="day8.html">&larr; Day 8</a><div style="flex:1"></div><a href="day10.html">Day 10 &rarr;</a></div>
+</div></div><script>
+function submitQuiz(id){
+  const w=document.getElementById(id);let score=0,total=0;
+  w.querySelectorAll('.qi').forEach(function(q){
+    total++;const ans=parseInt(q.dataset.answer);
+    const sel=q.querySelector('input:checked');
+    const ex=q.querySelector('.explain');
+    q.querySelectorAll('label').forEach(function(l){l.classList.remove('correct','wrong');});
+    if(sel){const v=parseInt(sel.value);const labels=q.querySelectorAll('label');
+      if(v===ans){score++;labels[ans].classList.add('correct');}
+      else{labels[v].classList.add('wrong');labels[ans].classList.add('correct');}}
+    else{q.querySelectorAll('label')[ans].classList.add('correct');}
+    if(ex)ex.style.display='block';
+  });
+  const r=w.querySelector('.qres');
+  if(r)r.textContent='得分：'+score+'/'+total+(score===total?' 🎉 全部正确！':' — 建议复习解析后重试');
+}
+</script></body></html>

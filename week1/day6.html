@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day 6 · 内部交易消除（ICMR） · SAP GR学习营</title>
+<style>
+:root{--navy:#054D25;--dark:#0A6B35;--primary:#0F7B3A;--mid:#1A9948;--steel:#4A8F65;--muted:#5B8C6B;--light:#A8D5B5;--pale:#D0EDD8;--bg:#EBF7EF;--white:#FFFFFF;--text:#0D2A18;--text2:#1F3D2C;--r:8px;--shadow:0 2px 12px rgba(15,123,58,.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.topnav{background:var(--dark);padding:0 32px;display:flex;align-items:center;gap:24px;height:56px;position:sticky;top:0;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topnav .logo{color:#fff;font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}.topnav .logo span{color:var(--light)}
+.topnav nav{display:flex;gap:4px;margin-left:auto}
+.topnav nav a{color:var(--light);text-decoration:none;padding:6px 12px;border-radius:4px;font-size:13px;transition:.15s}
+.topnav nav a:hover,.topnav nav a.active{background:var(--primary);color:#fff}
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:252px;min-width:252px;background:var(--dark);padding:20px 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+.sidebar .wk{color:var(--light);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 18px 4px}
+.sidebar a{display:flex;align-items:center;gap:9px;color:var(--pale);text-decoration:none;padding:9px 18px;font-size:13px;border-left:3px solid transparent;transition:.15s}
+.sidebar a:hover{background:rgba(255,255,255,.07);border-left-color:var(--light)}
+.sidebar a.active{background:rgba(15,123,58,.28);border-left-color:var(--primary);color:#fff}
+.sidebar .dn{background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.sidebar .sep{height:1px;background:rgba(255,255,255,.08);margin:8px 14px}
+.main{flex:1;padding:32px 40px;max-width:920px}
+.hero{background:linear-gradient(135deg,#003087 0%,var(--dark) 55%,var(--primary) 100%);border-radius:var(--r);padding:36px 40px 28px;color:#fff;margin-bottom:28px;border-bottom:3px solid var(--primary)}
+.hero h1{font-size:24px;margin-bottom:8px;line-height:1.35}
+.hero .sub{color:var(--pale);font-size:13.5px;max-width:640px}
+.hero .meta{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.hero .badge{background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;font-size:12px;color:var(--pale)}
+.bc{font-size:12px;color:var(--muted);margin-bottom:18px}
+.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--primary)}
+h2.sec{font-size:19px;color:var(--dark);border-left:4px solid var(--primary);padding-left:12px;margin:28px 0 14px}
+h3.sub{font-size:14.5px;color:var(--primary);margin:18px 0 8px;font-weight:700}
+p.b{font-size:14px;color:var(--text2);margin-bottom:11px;line-height:1.78}
+ul.b{font-size:14px;color:var(--text2);padding-left:20px;margin-bottom:12px;line-height:1.8}
+.box{border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13.5px;line-height:1.72}
+.box.blue{background:var(--pale);border-left:4px solid var(--primary);color:var(--text)}
+.box.green{background:#d1fae5;border-left:4px solid #059669;color:#064e3b}
+.box.amber{background:#fef3c7;border-left:4px solid #d97706;color:#78350f}
+.box.red{background:#fee2e2;border-left:4px solid #dc2626;color:#7f1d1d}
+.flow{display:flex;align-items:flex-start;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 0 12px;margin:18px 0}
+.flow-node{display:flex;flex-direction:column;align-items:center;min-width:88px}
+.flow-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;flex-shrink:0}
+.flow-label{font-size:10px;font-weight:700;color:var(--dark);margin-top:7px;text-align:center}
+.flow-sub{font-size:9px;color:var(--muted);text-align:center;margin-top:2px;line-height:1.4}
+.flow-arrow{display:flex;flex-direction:column;align-items:center;padding-top:14px;min-width:32px}
+.flow-arrow-sym{font-size:16px;color:var(--primary);font-weight:700}
+.flow-arrow-lbl{font-size:8px;color:var(--muted);text-align:center;margin-top:1px;line-height:1.3}
+table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 18px;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+table.st th{background:var(--dark);color:#fff;padding:10px 14px;text-align:left}
+table.st td{padding:9px 14px;border-bottom:1px solid var(--pale);color:var(--text2)}
+table.st tr:last-child td{border-bottom:none}
+table.st tr:hover td{background:var(--bg)}
+.quiz-wrap{background:var(--white);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin:22px 0}
+.quiz-wrap h3{font-size:15px;color:var(--dark);margin-bottom:14px}
+.qi{margin-bottom:18px}
+.qi .qt{font-size:14px;color:var(--text);margin-bottom:9px;font-weight:600}
+.qi label{display:flex;align-items:flex-start;gap:9px;padding:7px 11px;border-radius:6px;cursor:pointer;font-size:13.5px;color:var(--text2);border:1.5px solid transparent;transition:.15s;margin-bottom:5px}
+.qi label:hover{background:var(--pale);border-color:var(--light)}
+.qi input[type=radio]{margin-top:2px;accent-color:var(--primary)}
+.qi label.correct{background:#d1fae5;border-color:#059669;color:#064e3b}
+.qi label.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+.qi .explain{font-size:13px;color:var(--text2);background:var(--pale);border-radius:4px;padding:7px 11px;margin-top:5px;display:none}
+.qbtn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit;transition:.15s}
+.qbtn:hover{background:var(--dark)}
+.qres{font-weight:700;margin-top:10px;font-size:15px;color:var(--primary)}
+.day-nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:18px;border-top:1px solid var(--pale)}
+.day-nav a{background:var(--primary);color:#fff;text-decoration:none;padding:9px 20px;border-radius:6px;font-size:13px;transition:.15s}
+.day-nav a:hover{background:var(--dark)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--white);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border-top:3px solid var(--pale);text-decoration:none;transition:.15s;display:block}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,123,58,.18);border-top-color:var(--primary)}
+.card h3{font-size:13.5px;color:var(--dark);margin-bottom:5px}
+.card p{font-size:12px;color:var(--text2);line-height:1.5}
+.card .tag{display:inline-block;background:var(--pale);color:var(--primary);font-size:11px;padding:2px 8px;border-radius:10px;margin-top:7px;font-weight:600}
+@media(max-width:800px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:10px}.sidebar a{padding:5px 10px;border-left:none;font-size:12px}.main{padding:18px}}
+</style></head><body>
+<nav class="topnav">
+  <a class="logo" href="../index.html">SAP <span>GR</span> 学习营</a>
+  <nav><a href="../index.html">课程首页</a><a href="../week1/day1.html" class="active">Week 1</a><a href="../week2/day8.html">Week 2</a></nav>
+</nav>
+<div class="layout">
+<div class="sidebar">
+  <div class="wk">第一周 · 理论学习</div>
+  <a href="../week1/day1.html"><span class="dn">D1</span>什么是Group Reporting？</a>
+  <a href="../week1/day2.html"><span class="dn">D2</span>集团架构与合并单元</a>
+  <a href="../week1/day3.html"><span class="dn">D3</span>集团科目表与主数据</a>
+  <a href="../week1/day4.html"><span class="dn">D4</span>数据采集与GRDC 📹</a>
+  <a href="../week1/day5.html"><span class="dn">D5</span>合并准备：数据监控器</a>
+  <a href="../week1/day6.html" class="active"><span class="dn">D6</span>内部交易消除（ICMR）</a>
+  <a href="../week1/day7.html"><span class="dn">D7</span>合并流程与报表 📹</a>
+  <div class="wk">第二周 · 华照合并实战</div>
+  <div class="sep"></div>
+  <a href="../week2/day8.html"><span class="dn">D8</span>案例介绍：华照集团</a>
+  <a href="../week2/day9.html"><span class="dn">D9</span>集团架构配置实战</a>
+  <a href="../week2/day10.html"><span class="dn">D10</span>科目映射与GRDC实战</a>
+  <a href="../week2/day11.html"><span class="dn">D11</span>内部交易消除实战</a>
+  <a href="../week2/day12.html"><span class="dn">D12</span>合并月结与验收</a>
+</div>
+<div class="main">
+<div class="bc"><a href="../index.html">课程首页</a> / Week 1 · 理论学习 / Day 6</div>
+<div class="hero">
+  <h1>Day 6 · 内部交易消除（ICMR）</h1>
+  <div class="sub">IC Matching & Reconciliation、四类IC消除任务、Posting Level 20/30、华照内部交易场景</div>
+  <div class="meta"><span class="badge">⏱ 约50分钟</span><span class="badge">📖 IC消除</span></div>
+</div>
+
+<h2 class="sec">6.1 为什么需要 IC 消除</h2>
+<p class="b">集团合并要求将内部交易（集团内法人之间的交易）在合并报表中消除，使合并报表反映集团整体面向外部的经济实质。</p>
+<div class="box red"><strong>华照内部交易示例：</strong>总部向高明分公司销售产品 1.5 亿元。如不消除：合并报表收入和成本各虚增 1.5 亿，集团净利润不变但规模虚增。<strong>必须消除：</strong>内部销售收入 1.5 亿 + 内部采购成本 1.5 亿（互相抵消）。</div>
+
+<h2 class="sec">6.2 IC Matching & Reconciliation（ICMR）</h2>
+<p class="b">ICMR 是 SAP GR 的创新功能，实现凭证级别的实时内部交易匹配（来源：SAP 集团报告深度解析 Slides 10-11）：</p>
+<table class="st">
+<tr><th>特性</th><th>传统方式</th><th>ICMR</th></tr>
+<tr><td>对账粒度</td><td>科目余额级</td><td>凭证行项目级</td></tr>
+<tr><td>对账时机</td><td>月末集中</td><td>月中持续（Continuous Accounting）</td></tr>
+<tr><td>差异处理</td><td>财务手工确认</td><td>内置工作流，自动推送给相关法人</td></tr>
+<tr><td>IT 依赖</td><td>需要 IT 配置 ETL</td><td>财务人员自行配置规则，无需 IT</td></tr>
+<tr><td>追溯能力</td><td>只能到科目</td><td>直接下钻到原始凭证</td></tr>
+</table>
+
+<h2 class="sec">6.3 四类 IC Elimination 任务</h2>
+<div class="flow">
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">📉</div><div class="flow-label">其他损益</div><div class="flow-sub">IC P&L（单边）<br>Task 2010</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">💰</div><div class="flow-label">股利</div><div class="flow-sub">IC Dividends<br>Task 2020（单边）</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#d0edd8;font-size:14px">⚖️</div><div class="flow-label">B/S 余额</div><div class="flow-sub">IC B/S（双边）<br>Task 2030</div></div>
+<div class="flow-arrow"><div class="flow-arrow-sym">→</div></div>
+<div class="flow-node"><div class="flow-icon" style="background:#a8d5b5;font-size:14px">📦</div><div class="flow-label">未实现毛利</div><div class="flow-sub">IC Gross Profit<br>Task 2040（单边）</div></div>
+</div>
+<div class="box blue"><strong>Posting Level 理解：</strong>消除分录使用 Posting Level 20（IC消除，Pair：合并单元+配对单元），集团层面调整用 Posting Level 30。普通法人数据是 Posting Level 00（申报数据）。</div>
+
+<h2 class="sec">6.4 华照内部交易场景</h2>
+<table class="st">
+<tr><th>场景</th><th>交易方</th><th>金额</th><th>消除类型</th></tr>
+<tr><td>内部销售</td><td>总部 → 高明分公司</td><td>1.5亿元</td><td>IC P&L Sales & COGS</td></tr>
+<tr><td>委托加工</td><td>总部 → 沪乐（用友U8）</td><td>约3,000万</td><td>IC P&L + 未实现毛利</td></tr>
+<tr><td>集团借款</td><td>总部 → 泰国FZ40</td><td>5,000万泰铢</td><td>IC B/S（应收/应付）</td></tr>
+<tr><td>管理费分摊</td><td>总部 → 各子公司</td><td>按比例分摊</td><td>IC P&L Other</td></tr>
+</table>
+
+<div class="quiz-wrap" id="q6"><h3>📝 知识测验 — Day 6</h3>
+<div class="qi" data-answer="2"><div class="qt">Q1. 华照总部向高明分公司销售产品1.5亿元，在集团合并时需要消除什么？</div>
+<label><input type="radio" name="q6q1" value="0">只消除总部的收入</label>
+<label><input type="radio" name="q6q1" value="1">只消除高明的成本</label>
+<label><input type="radio" name="q6q1" value="2">同时消除总部销售收入1.5亿（贷方）和高明采购成本1.5亿（借方），两边各消除</label>
+<label><input type="radio" name="q6q1" value="3">不需要消除，因为都是集团内部</label>
+<div class="explain">✅ IC 消除是双边的：总部的内部销售收入（P&L贷方 +1.5亿）和高明的内部采购成本（P&L借方 +1.5亿）都必须消除，才能使合并 P&L 只反映面向集团外部的收入和成本。如果只消除一边，合并报表就会失真。</div></div>
+<div class="qi" data-answer="1"><div class="qt">Q2. SAP ICMR 相比传统IC对账方式最大的创新是什么？</div>
+<label><input type="radio" name="q6q2" value="0">不需要财务人员操作，完全自动化</label>
+<label><input type="radio" name="q6q2" value="1">凭证行项目级的实时匹配，财务人员可直接配置规则，无需 IT 介入，月中持续对账（持续会计）</label>
+<label><input type="radio" name="q6q2" value="2">可以消除跨国交易的汇率差异</label>
+<label><input type="radio" name="q6q2" value="3">替代了审计师的职能</label>
+<div class="explain">✅ ICMR 的核心价值：①凭证级（而非科目余额级）匹配，精度更高；②实时匹配，发现差异可立即处理（不用等到月末）；③财务人员自行配置匹配规则（无需IT写代码）；④内置工作流处理差异。这些特性使得"持续会计"成为可能，月结周期从 T+15 缩短到 T+3。</div></div>
+<div class="qi" data-answer="0"><div class="qt">Q3. IC Elimination 消除分录使用哪个 Posting Level？</div>
+<label><input type="radio" name="q6q3" value="0">Posting Level 20（IC消除，关联关系：合并单元+配对单元）</label>
+<label><input type="radio" name="q6q3" value="1">Posting Level 00（申报数据）</label>
+<label><input type="radio" name="q6q3" value="2">Posting Level 30（合并层）</label>
+<label><input type="radio" name="q6q3" value="3">Posting Level 10（调整）</label>
+<div class="explain">✅ SAP GR 中每条数据都有 Posting Level 标签：00 = 法人申报数据；10 = 对申报数据的调整；20 = IC消除（需要指定合并单元+配对单元这一"配对"关系）；30 = 集团层面的合并调整（不涉及特定配对）。理解 Posting Level 是读懂合并分录的关键。</div></div>
+<button class="qbtn" onclick="submitQuiz('q6')">提交答案</button><div class="qres"></div></div>
+<div class="day-nav"><a href="day5.html">&larr; Day 5</a><div style="flex:1"></div><a href="day7.html">Day 7 &rarr;</a></div>
+</div></div>
+<script>
+function submitQuiz(id){
+  const w=document.getElementById(id);let score=0,total=0;
+  w.querySelectorAll('.qi').forEach(function(q){
+    total++;const ans=parseInt(q.dataset.answer);
+    const sel=q.querySelector('input:checked');
+    const ex=q.querySelector('.explain');
+    q.querySelectorAll('label').forEach(function(l){l.classList.remove('correct','wrong');});
+    if(sel){const v=parseInt(sel.value);const labels=q.querySelectorAll('label');
+      if(v===ans){score++;labels[ans].classList.add('correct');}
+      else{labels[v].classList.add('wrong');labels[ans].classList.add('correct');}}
+    else{q.querySelectorAll('label')[ans].classList.add('correct');}
+    if(ex)ex.style.display='block';
+  });
+  const r=w.querySelector('.qres');
+  if(r)r.textContent='得分：'+score+'/'+total+(score===total?' 🎉 全部正确！':' — 建议复习解析后重试');
+}
+</script></body></html>

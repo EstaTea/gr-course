@@ -1,0 +1,190 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Day 12 · 合并月结与验收 · SAP GR学习营</title>
+<style>
+:root{--navy:#054D25;--dark:#0A6B35;--primary:#0F7B3A;--mid:#1A9948;--steel:#4A8F65;--muted:#5B8C6B;--light:#A8D5B5;--pale:#D0EDD8;--bg:#EBF7EF;--white:#FFFFFF;--text:#0D2A18;--text2:#1F3D2C;--r:8px;--shadow:0 2px 12px rgba(15,123,58,.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+.topnav{background:var(--dark);padding:0 32px;display:flex;align-items:center;gap:24px;height:56px;position:sticky;top:0;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.topnav .logo{color:#fff;font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap}.topnav .logo span{color:var(--light)}
+.topnav nav{display:flex;gap:4px;margin-left:auto}
+.topnav nav a{color:var(--light);text-decoration:none;padding:6px 12px;border-radius:4px;font-size:13px;transition:.15s}
+.topnav nav a:hover,.topnav nav a.active{background:var(--primary);color:#fff}
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:252px;min-width:252px;background:var(--dark);padding:20px 0;overflow-y:auto;position:sticky;top:56px;height:calc(100vh - 56px)}
+.sidebar .wk{color:var(--light);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:14px 18px 4px}
+.sidebar a{display:flex;align-items:center;gap:9px;color:var(--pale);text-decoration:none;padding:9px 18px;font-size:13px;border-left:3px solid transparent;transition:.15s}
+.sidebar a:hover{background:rgba(255,255,255,.07);border-left-color:var(--light)}
+.sidebar a.active{background:rgba(15,123,58,.28);border-left-color:var(--primary);color:#fff}
+.sidebar .dn{background:var(--primary);color:#fff;border-radius:50%;width:22px;height:22px;min-width:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.sidebar .sep{height:1px;background:rgba(255,255,255,.08);margin:8px 14px}
+.main{flex:1;padding:32px 40px;max-width:920px}
+.hero{background:linear-gradient(135deg,#003087 0%,var(--dark) 55%,var(--primary) 100%);border-radius:var(--r);padding:36px 40px 28px;color:#fff;margin-bottom:28px;border-bottom:3px solid var(--primary)}
+.hero h1{font-size:24px;margin-bottom:8px;line-height:1.35}
+.hero .sub{color:var(--pale);font-size:13.5px;max-width:640px}
+.hero .meta{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+.hero .badge{background:rgba(255,255,255,.15);padding:3px 12px;border-radius:20px;font-size:12px;color:var(--pale)}
+.bc{font-size:12px;color:var(--muted);margin-bottom:18px}
+.bc a{color:var(--muted);text-decoration:none}.bc a:hover{color:var(--primary)}
+h2.sec{font-size:19px;color:var(--dark);border-left:4px solid var(--primary);padding-left:12px;margin:28px 0 14px}
+h3.sub{font-size:14.5px;color:var(--primary);margin:18px 0 8px;font-weight:700}
+p.b{font-size:14px;color:var(--text2);margin-bottom:11px;line-height:1.78}
+ul.b{font-size:14px;color:var(--text2);padding-left:20px;margin-bottom:12px;line-height:1.8}
+.box{border-radius:var(--r);padding:14px 18px;margin-bottom:14px;font-size:13.5px;line-height:1.72}
+.box.blue{background:var(--pale);border-left:4px solid var(--primary);color:var(--text)}
+.box.green{background:#d1fae5;border-left:4px solid #059669;color:#064e3b}
+.box.amber{background:#fef3c7;border-left:4px solid #d97706;color:#78350f}
+.box.red{background:#fee2e2;border-left:4px solid #dc2626;color:#7f1d1d}
+.flow{display:flex;align-items:flex-start;gap:0;flex-wrap:nowrap;overflow-x:auto;padding:4px 0 12px;margin:18px 0}
+.flow-node{display:flex;flex-direction:column;align-items:center;min-width:88px}
+.flow-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;flex-shrink:0}
+.flow-label{font-size:10px;font-weight:700;color:var(--dark);margin-top:7px;text-align:center}
+.flow-sub{font-size:9px;color:var(--muted);text-align:center;margin-top:2px;line-height:1.4}
+.flow-arrow{display:flex;flex-direction:column;align-items:center;padding-top:14px;min-width:32px}
+.flow-arrow-sym{font-size:16px;color:var(--primary);font-weight:700}
+.flow-arrow-lbl{font-size:8px;color:var(--muted);text-align:center;margin-top:1px;line-height:1.3}
+table.st{width:100%;border-collapse:collapse;font-size:13.5px;margin:10px 0 18px;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+table.st th{background:var(--dark);color:#fff;padding:10px 14px;text-align:left}
+table.st td{padding:9px 14px;border-bottom:1px solid var(--pale);color:var(--text2)}
+table.st tr:last-child td{border-bottom:none}
+table.st tr:hover td{background:var(--bg)}
+.quiz-wrap{background:var(--white);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);margin:22px 0}
+.quiz-wrap h3{font-size:15px;color:var(--dark);margin-bottom:14px}
+.qi{margin-bottom:18px}
+.qi .qt{font-size:14px;color:var(--text);margin-bottom:9px;font-weight:600}
+.qi label{display:flex;align-items:flex-start;gap:9px;padding:7px 11px;border-radius:6px;cursor:pointer;font-size:13.5px;color:var(--text2);border:1.5px solid transparent;transition:.15s;margin-bottom:5px}
+.qi label:hover{background:var(--pale);border-color:var(--light)}
+.qi input[type=radio]{margin-top:2px;accent-color:var(--primary)}
+.qi label.correct{background:#d1fae5;border-color:#059669;color:#064e3b}
+.qi label.wrong{background:#fee2e2;border-color:#dc2626;color:#7f1d1d}
+.qi .explain{font-size:13px;color:var(--text2);background:var(--pale);border-radius:4px;padding:7px 11px;margin-top:5px;display:none}
+.qbtn{background:var(--primary);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-size:14px;cursor:pointer;margin-top:4px;font-family:inherit;transition:.15s}
+.qbtn:hover{background:var(--dark)}
+.qres{font-weight:700;margin-top:10px;font-size:15px;color:var(--primary)}
+.day-nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:18px;border-top:1px solid var(--pale)}
+.day-nav a{background:var(--primary);color:#fff;text-decoration:none;padding:9px 20px;border-radius:6px;font-size:13px;transition:.15s}
+.day-nav a:hover{background:var(--dark)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-bottom:24px}
+.card{background:var(--white);border-radius:var(--r);padding:18px;box-shadow:var(--shadow);border-top:3px solid var(--pale);text-decoration:none;transition:.15s;display:block}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,123,58,.18);border-top-color:var(--primary)}
+.card h3{font-size:13.5px;color:var(--dark);margin-bottom:5px}
+.card p{font-size:12px;color:var(--text2);line-height:1.5}
+.card .tag{display:inline-block;background:var(--pale);color:var(--primary);font-size:11px;padding:2px 8px;border-radius:10px;margin-top:7px;font-weight:600}
+@media(max-width:800px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;position:static;display:flex;flex-wrap:wrap;gap:4px;padding:10px}.sidebar a{padding:5px 10px;border-left:none;font-size:12px}.main{padding:18px}}
+</style></head><body>
+<nav class="topnav"><a class="logo" href="../index.html">SAP <span>GR</span> 学习营</a><nav><a href="../index.html">课程首页</a><a href="../week1/day1.html">Week 1</a><a href="../week2/day8.html" class="active">Week 2</a></nav></nav>
+<div class="layout"><div class="sidebar">
+  <div class="wk">第一周 · 理论学习</div>
+  <a href="../week1/day1.html"><span class="dn">D1</span>什么是Group Reporting？</a>
+  <a href="../week1/day2.html"><span class="dn">D2</span>集团架构与合并单元</a>
+  <a href="../week1/day3.html"><span class="dn">D3</span>集团科目表与主数据</a>
+  <a href="../week1/day4.html"><span class="dn">D4</span>数据采集与GRDC 📹</a>
+  <a href="../week1/day5.html"><span class="dn">D5</span>合并准备：数据监控器</a>
+  <a href="../week1/day6.html"><span class="dn">D6</span>内部交易消除（ICMR）</a>
+  <a href="../week1/day7.html"><span class="dn">D7</span>合并流程与报表 📹</a>
+  <div class="wk">第二周 · 华照合并实战</div><div class="sep"></div>
+  <a href="day8.html"><span class="dn">D8</span>案例介绍：华照集团</a>
+  <a href="day9.html"><span class="dn">D9</span>集团架构配置实战</a>
+  <a href="day10.html"><span class="dn">D10</span>科目映射与GRDC实战</a>
+  <a href="day11.html"><span class="dn">D11</span>内部交易消除实战</a>
+  <a href="day12.html" class="active"><span class="dn">D12</span>合并月结与验收</a>
+</div>
+<div class="main">
+<div class="bc"><a href="../index.html">课程首页</a> / Week 2 · 华照合并实战 / Day 12</div>
+<div class="hero"><h1>Day 12 · 合并月结与验收</h1><div class="sub">首次完整月结D0→D+3、三张合并报表核对清单、验收标准、Go-Live建议与二期路线图</div><div class="meta"><span class="badge">⏱ 约50分钟</span><span class="badge">✅ 验收结业</span><span class="badge">🎓 课程完成</span></div></div>
+
+<h2 class="sec">12.1 华照首次月结完整流程</h2>
+<div class="box green"><strong>目标：</strong>完成华照 S/4HANA Go-Live 后第一个完整月结，产生准确的三张合并报表，月结周期 ≤ T+3。<br><strong>验收标准：</strong>这是合同硬性门槛——触发实施第二批45%付款（约427万元）的必要条件。</div>
+<table class="st">
+<tr><th>时间</th><th>任务</th><th>工具</th><th>负责人</th></tr>
+<tr><td>D0（月末）</td><td>账务截止，最后凭证冻结</td><td>S/4HANA 期间管理</td><td>各法人会计</td></tr>
+<tr><td>D+1 早</td><td>15家法人 Release Universal Journal</td><td>Data Monitor</td><td>集团财务</td></tr>
+<tr><td>D+1 下午</td><td>沪乐 GRDC 文件上载</td><td>GRDC Data Mapping</td><td>沪乐财务</td></tr>
+<tr><td>D+2 早</td><td>货币折算（泰国THB/德国EUR）</td><td>Data Monitor</td><td>集团财务</td></tr>
+<tr><td>D+2 下午</td><td>IC Matching 确认 + 消除任务执行</td><td>Consolidation Monitor</td><td>GR 顾问</td></tr>
+<tr><td>D+3 早</td><td>投资消除（COI）+ 合并数据校验</td><td>Consolidation Monitor</td><td>GR 顾问</td></tr>
+<tr><td>D+3 下午</td><td>三张合并报表生成 + 验收签字</td><td>Review Booklet / Fiori 报表</td><td>曾肖静（CFO）</td></tr>
+</table>
+
+<h2 class="sec">12.2 三张合并报表核对清单</h2>
+<table class="st">
+<tr><th>报表</th><th>关键检查项</th><th>常见问题</th></tr>
+<tr><td>合并资产负债表（B/S）</td><td>① 借贷平衡；② 内部应收/应付归零；③ 少数股东权益正确列示</td><td>IC B/S 消除后残差；NCI 计算错误</td></tr>
+<tr><td>合并利润表（P&L）</td><td>① 内部销售收入归零；② 净利润合理；③ NCI 利润分配正确</td><td>未消除内部毛利；货币折算差异</td></tr>
+<tr><td>合并现金流量表（CFS）</td><td>① 经营/投资/筹资三类现金流分类正确；② 与净利润调节一致</td><td>Subitem（交易类型）配置错误导致分类偏差</td></tr>
+</table>
+
+<h2 class="sec">12.3 验收标准核查</h2>
+<div style="display:flex;flex-direction:column;gap:8px;margin:16px 0">
+  <div style="background:var(--white);border-radius:var(--r);padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px">
+    <div style="width:24px;height:24px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✅</div>
+    <div style="font-size:12px"><strong>月结周期 ≤ T+3：</strong>首次月结完成时间记录（合同门槛）</div>
+  </div>
+  <div style="background:var(--white);border-radius:var(--r);padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px">
+    <div style="width:24px;height:24px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✅</div>
+    <div style="font-size:12px"><strong>三张合并报表准确生成：</strong>合并 B/S、合并 P&L、合并 CFS（合同硬性门槛）</div>
+  </div>
+  <div style="background:var(--white);border-radius:var(--r);padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px">
+    <div style="width:24px;height:24px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✅</div>
+    <div style="font-size:12px"><strong>内部交易余额归零：</strong>所有 IC 应收/应付/收入/成本在合并层面消除</div>
+  </div>
+  <div style="background:var(--white);border-radius:var(--r);padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px">
+    <div style="width:24px;height:24px;background:#fef9c3;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⬜</div>
+    <div style="font-size:12px"><strong>泰国/德国境外折算正确：</strong>THB 和 EUR 按期末汇率折算，OCI 汇兑差异正确入账</div>
+  </div>
+  <div style="background:var(--white);border-radius:var(--r);padding:12px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px">
+    <div style="width:24px;height:24px;background:#fef9c3;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">⬜</div>
+    <div style="font-size:12px"><strong>沪乐GRDC数据纳入：</strong>GRDC 文件上载成功，沪乐数据正确反映在合并报表中</div>
+  </div>
+</div>
+
+<h2 class="sec">12.4 Go-Live 建议与后续路线图</h2>
+<table class="st">
+<tr><th>阶段</th><th>时间</th><th>主要工作</th></tr>
+<tr><td>Hypercare（超级支持）</td><td>Go-Live后0-2个月</td><td>驻场支持；每日监控 Data Monitor 状态；快速响应用户问题</td></tr>
+<tr><td>稳定运营</td><td>Go-Live后2-6个月</td><td>月结流程固化；用户培训；优化月结时间表</td></tr>
+<tr><td>附注扩展</td><td>6个月后</td><td>逐步开发次要附注报表（07-07决议中延后的部分）</td></tr>
+<tr><td>二期：SAC 集成</td><td>稳定后启动</td><td>Group Reporting 数据推送 SAC，构建管理驾驶舱 L1-L3</td></tr>
+<tr><td>二期：CBAM 合规</td><td>2026年底前</td><td>德国 FZ33 碳足迹数据纳入，扩展 GR 数据模型（类型3变更）</td></tr>
+</table>
+<div class="box green"><strong>🎉 课程完成！</strong>两周学习完成：你已掌握 SAP Group Reporting 的核心理论（Week 1）和华照集团合并实战配置（Week 2）。在佛照项目中，你将作为 FICO GR 顾问，负责推动月结周期从 T+15 缩短到 T+3，这是整个项目最重要的财务数字化成果之一。</div>
+
+<div class="quiz-wrap" id="q12"><h3>📝 综合测验 — Day 12 · 课程结业</h3>
+<div class="qi" data-answer="1"><div class="qt">Q1. 华照首次月结在 D+1 早上应该优先完成什么工作？</div>
+<label><input type="radio" name="q12q1" value="0">运行 IC 消除任务</label>
+<label><input type="radio" name="q12q1" value="1">15家法人全部完成 Release Universal Journal，将 ACDOCA 数据发布到 ACDOCU</label>
+<label><input type="radio" name="q12q1" value="2">生成合并报表</label>
+<label><input type="radio" name="q12q1" value="3">配置货币折算方法</label>
+<div class="explain">✅ T+3 月结的关键路径：D+1 早上必须完成所有法人的 Release UJ，这是后续所有步骤的前提。如果某个法人的 Release UJ 失败（如 ACDOCA 数据不平衡），整个月结流程会在这一步阻塞。</div></div>
+<div class="qi" data-answer="2"><div class="qt">Q2. 合并 B/S 中发现内部应收款没有完全归零（还剩300万），最可能的原因是什么？</div>
+<label><input type="radio" name="q12q2" value="0">GR 系统 Bug</label>
+<label><input type="radio" name="q12q2" value="1">科目映射配置错误</label>
+<label><input type="radio" name="q12q2" value="2">ICMR 对账存在未解决的差异（超过容忍度），IC B/S 消除（Task 2030）未完全执行，或某法人使用了未配置 IC 标记的科目</label>
+<label><input type="radio" name="q12q2" value="3">货币折算方法设置错误</label>
+<div class="explain">✅ IC B/S 余额不归零通常有三个原因：①ICMR 中某笔内部交易存在差异且超过容忍度，被搁置未处理；②某法人的内部往来科目没有正确配置 Partner Unit（配对单元），GR 无法识别这是内部交易；③Task 2030 执行时某合并单元的状态不满足（如尚未完成货币折算）。需要逐一排查 Consolidation Monitor 的任务日志。</div></div>
+<div class="qi" data-answer="0"><div class="qt">Q3. 整个 GR 课程学习完毕后，你认为 Group Reporting 对佛照项目最核心的价值是什么？</div>
+<label><input type="radio" name="q12q3" value="0">消除 ETL 中间层 + ICMR 持续对账，将月结从 T+15 压缩到 T+3，使 CFO 能在每月第3天拿到准确的集团合并报表，做出更及时的经营决策</label>
+<label><input type="radio" name="q12q3" value="1">降低 SAP 许可费用</label>
+<label><input type="radio" name="q12q3" value="2">让 IT 部门减少工作量</label>
+<label><input type="radio" name="q12q3" value="3">替代审计师的功能</label>
+<div class="explain">✅ GR 对佛照的核心价值：从"财务部门月底苦苦拼Excel合并报表"变成"月初第3天CFO就能看到准确的集团合并三张表"。这不只是效率提升，更是决策模式的升级——从滞后信息到近实时信息，支撑管理层对19家法人的实时掌控，直接服务于扣非净利率从0.95%向行业均值靠拢的战略目标。</div></div>
+<button class="qbtn" onclick="submitQuiz('q12')">提交答案</button><div class="qres"></div></div>
+<div class="day-nav"><a href="day11.html">&larr; Day 11</a><div style="flex:1"></div><span></span></div>
+</div></div><script>
+function submitQuiz(id){
+  const w=document.getElementById(id);let score=0,total=0;
+  w.querySelectorAll('.qi').forEach(function(q){
+    total++;const ans=parseInt(q.dataset.answer);
+    const sel=q.querySelector('input:checked');
+    const ex=q.querySelector('.explain');
+    q.querySelectorAll('label').forEach(function(l){l.classList.remove('correct','wrong');});
+    if(sel){const v=parseInt(sel.value);const labels=q.querySelectorAll('label');
+      if(v===ans){score++;labels[ans].classList.add('correct');}
+      else{labels[v].classList.add('wrong');labels[ans].classList.add('correct');}}
+    else{q.querySelectorAll('label')[ans].classList.add('correct');}
+    if(ex)ex.style.display='block';
+  });
+  const r=w.querySelector('.qres');
+  if(r)r.textContent='得分：'+score+'/'+total+(score===total?' 🎉 全部正确！':' — 建议复习解析后重试');
+}
+</script></body></html>
